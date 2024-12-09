@@ -1,0 +1,20 @@
+[
+  {
+    "$lookup": {
+      "from": "comments",
+      "localField": "_id",
+      "foreignField": "movie_id",
+      "as": "comments"
+    }
+  },
+  {
+    "$project": {
+      "_id": 0,
+      "title": 1,
+      "comments.name": 1,
+      "comments.email": 1,
+      "comments.text": 1,
+      "comments.date": 1
+    }
+  }
+]

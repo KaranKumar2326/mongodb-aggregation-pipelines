@@ -1,0 +1,52 @@
+[
+    {
+      "$match": {
+        "imdb.rating": { "$exists": true, "$type": ["double", "int"] }
+      }
+    },
+    {
+      "$project": {
+        "title": 1,
+        "imdbRating": "$imdb.rating"
+      }
+    },
+    {
+      "$sort": { "imdbRating": -1 }
+    },
+    {
+      "$limit": 5
+    },
+    {
+      "$lookup": {
+        "from": "comments",
+        "let": { "movieId": "$_id" },
+        "pipeline": [
+          {
+            "$match": {
+              "$expr": { "$eq": ["$movie_id", "$$movieId"] }
+            }
+          },
+          {
+            "$count": "count"
+          }
+        ],
+        "as": "commentsCount"
+      }
+    },
+    {
+      "$addFields": {
+        "commentCount": {
+          "$ifNull": [{ "$arrayElemAt": ["$commentsCount.count", 0] }, 0]
+        }
+      }
+    },
+    {
+      "$project": {
+        "_id": 0,
+        "title": 1,
+        "imdbRating": 1,
+        "commentCount": 1
+      }
+    }
+  ]
+  
